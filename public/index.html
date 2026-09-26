@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>cronview</title>
+<style>
+  body { font-family: ui-monospace, monospace; background: #111; color: #ddd; max-width: 860px; margin: 2rem auto; padding: 0 1rem; }
+  textarea { width: 100%; height: 9em; background: #1a1a1a; color: #eee; border: 1px solid #444; font: inherit; }
+  button { background: #2d6cdf; color: white; border: 0; padding: .5em 1.2em; font: inherit; cursor: pointer; }
+  .card { border: 1px solid #333; padding: .7em 1em; margin: .6em 0; background: #191919; }
+  .desc { color: #8fd18f; }
+  .next { color: #9db8d9; font-size: .9em; }
+  .err { color: #e07070; }
+  h1 { font-size: 1.2rem; } .muted { color: #777; font-size: .85em; }
+</style>
+</head>
+<body>
+<h1>cronview</h1>
+<p class="muted">paste crontab lines — human descriptions + next 5 runs</p>
+<textarea id="lines">*/15 * * * *
+0 9 * * 1-5
+30 2 1 * *
+0 0 1 1 *</textarea>
+<button onclick="explain()">explain</button>
+<div id="out"></div>
+<script>
+async function explain() {
+  const lines = document.getElementById("lines").value;
+  const res = await fetch("/api/explain?lines=" + encodeURIComponent(lines));
+  const { results } = await res.json();
+  document.getElementById("out").innerHTML = results.map(r => {
+    if (r.error) return `<div class="card err">✗ ${r.line}: ${r.error}</div>`;
+    return `<div class="card"><b>${r.line}</b><div class="desc">${r.desc}</div>` +
+      (r.next || []).map(n => `<div class="next">→ ${n}</div>`).join("") + `</div>`;
+  }).join("");
+}
+explain();
+</script>
+</body>
+</html>
