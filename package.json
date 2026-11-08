@@ -4,7 +4,7 @@
   "description": "Crontab lines to human language, next-run calculation, validation and a tiny web demo. Zero dependencies.",
   "type": "module",
   "scripts": {
-    "test": "node --test test/",
+    "test": "node --test 'test/*.test.ts'",
     "start": "node src/server.ts"
   },
   "engines": { "node": ">=22.18" },
